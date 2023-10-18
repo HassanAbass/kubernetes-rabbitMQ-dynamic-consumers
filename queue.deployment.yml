@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: local-rabbit-pod
+  labels:
+    app: rabbit-pod
+spec:
+  containers:
+  - name: rabbitmq-container
+    image: rabbitmq:3-management
+    ports:
+    - containerPort: 15672 # RabbitMQ Management UI
+    - containerPort: 5672  # AMQP port
+    envFrom:
+    - configMapRef:
+        name: rabbitmq-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-service
+spec:
+  selector:
+    app: rabbit-pod
+  ports:
+    - port: 15672
+      name: management
+      targetPort: 15672
+    - protocol: TCP
+      port: 5672
+      name: ampqp
+      targetPort: 5672
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+data:
+  RABBITMQ_DEFAULT_USER: user
+  RABBITMQ_DEFAULT_PASS: password
+---
+

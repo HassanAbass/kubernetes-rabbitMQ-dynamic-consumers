@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: producer-app
+  labels:
+    app: app-producer
+spec:
+  # securityContext:
+  #   runAsUser: 0 
+  containers:
+  - name: app-producer
+    imagePullPolicy: Never
+    image: consumer-app
+    envFrom:
+    - configMapRef:
+        name: rabbitmq-config-env
+    # volumeMounts:
+    # - name: code-volume
+    #   mountPath: /app
+    # - name: hostpath-volume1
+    #   mountPath: /app
+  # volumes:
+  # - name: code-volume
+  #   configMap:
+  #     name: producer-code-config
+  #     defaultMode: 0777
+  # - name: hostpath-volume
+  #   hostPath:
+  #     path: /home/hab/node-server/docker/last_task/producer
+  # - name: hostpath-volume1
+  #   hostPath:
+  #     path: /home/hab/node-server/docker/last_task/producer/producer.js
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config-env
+data:
+  RABBITMQ_USERNAME: user
+  RABBITMQ_PASSWORD: password
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: producer-code-config
+data:
+  manifst.json: |
+    {
+      "name": "examples",
+      "version": "1.0.0",
+      "description": "",
+      "main": "app.js",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "keywords": [],
+      "author": "",
+      "license": "ISC",
+      "dependencies": {
+        "amqplib": "*"
+      }
+    }
+  producer.js: |
+    const amqp = require('amqplib');
+
+    async function main() {
+      try {
+        const connection = await amqp.connect('amqp://localhost');
+        const channel = await connection.createChannel();
+
+        const queue = 'new-queue';
+        const message = 'Hello, RabbitMQ!';
+
+        // Assert the queue (create it if it doesn't exist)
+        await channel.assertQueue(queue);
+
+        // Send a message to the queue
+        channel.sendToQueue(queue, Buffer.from(message));
+        console.log(`Sent: ${message}`);
+      } catch (error) {
+        console.error('Error:', error.message);
+      }
+    }
+
+    main().catch(console.error);
+
+

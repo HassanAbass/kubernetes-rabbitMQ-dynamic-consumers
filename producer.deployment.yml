@@ -38,6 +38,7 @@ metadata:
 data:
   RABBITMQ_USERNAME: user
   RABBITMQ_PASSWORD: password
+  MESSAGE_INTERVALS: '10'
 ---
 apiVersion: v1
 kind: ConfigMap

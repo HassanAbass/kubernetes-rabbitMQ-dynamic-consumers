@@ -37,9 +37,9 @@ data:
       scrape_interval: 1s
 
     scrape_configs:
-    - job_name: 'web-server'
+    - job_name: 'producer-server'
       static_configs:
-      - targets: ['prom-web-server:8080']  # Service name and port of your web server
+      - targets: ['producer-service:3000']  # Service name and port of your web server
 ---
 apiVersion: v1
 kind: Service

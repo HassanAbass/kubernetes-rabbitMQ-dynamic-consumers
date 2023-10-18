@@ -10,4 +10,6 @@ COPY . .
 # Build your Node.js application (if needed)
 RUN npm install
 
+EXPOSE 3000
+
 CMD ["node", "producer.js"]

@@ -11,6 +11,9 @@
   "license": "ISC",
   "dependencies": {
     "amqplib": "*",
-    "dotenv": "*"
+    "dotenv": "*",
+    "express": "*",
+    "prom-client": "*",
+    "express-prom-bundle": "*"
   }
 }

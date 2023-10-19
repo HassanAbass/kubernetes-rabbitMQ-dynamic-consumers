@@ -17,7 +17,7 @@ spec:
       containers:
         - name: app-producer
           imagePullPolicy: Never
-          image: consumer-app
+          image: rabbitmq-publisher
           ports:
             - containerPort: 3000
           envFrom:
@@ -31,7 +31,7 @@ metadata:
 data:
   RABBITMQ_USERNAME: user
   RABBITMQ_PASSWORD: password
-  MESSAGE_INTERVALS: "10"
+  MESSAGE_INTERVALS: "5"
   SERVER_PORT: "3000"
 ---
 apiVersion: v1

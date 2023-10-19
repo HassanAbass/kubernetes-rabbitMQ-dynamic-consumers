@@ -14,10 +14,11 @@ const main = async () => {
 
     const channel = await connection.createChannel();
     await channel.assertQueue(queueName);
-
     // Function to send a message to the queue
     const sendMessage = async () => {
-      const message = `Hello, RabbitMQ! Here's a message at ${(new Date()).toDateString()}.`;
+      const queueCount =( await channel.checkQueue(queueName)).messageCount;
+
+      const message = `Hello, RabbitMQ! Here's a message num_${queueCount}.`;
       channel.sendToQueue(queueName, Buffer.from(message));
       console.log(`Sent: ${message}`);
     };

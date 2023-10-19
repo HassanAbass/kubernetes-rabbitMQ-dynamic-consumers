@@ -1,94 +1,53 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  # replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx-container
-        image: nginx:latest
-        ports:
-        - containerPort: 80
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: rabbitmq-consumer-pod
+# spec:
+#   containers:
+#   - name: consumer-container
+#     image: node:18
+#     command:
+#     - "/bin/sh"
+#     - "-c"
+#     - |
+#       cd /app
+#       npm i
+#       node consumer.js
+#     volumeMounts:
+#     - name: app-code
+#       mountPath: /app
+#     envFrom:
+#     - configMapRef:
+#         name: rabbitmq-config-env
+#   volumes:
+#   - name: app-code
+#     hostPath:
+#       # docker-desktop producer directory's path on WSL
+#       path:  /run/desktop/mnt/host/wsl/consumer
 ---
 apiVersion: v1
-kind: Service
+kind: Pod
 metadata:
-  name: nginx-service
+  name: rabbitmq-consumer-pod
 spec:
-  selector:
-    app: nginx
-  type: LoadBalancer
-  ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 80
----
-# apiVersion: external.metrics.k8s.io/v1
-# kind: ExternalMetric
-# metadata:
-#   name: rabbitmq-queue-size
-# spec:
-#   name: rabbitmq_queue_size  # This should match the name of your metric in Prometheus
-#   selector: {}
-#   targetValue: "100"  # Adjust this value based on your scaling criteria
-
----
-apiVersion: autoscaling/v2beta1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: horz-auto-scaler
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: producer-app-deployment
-  minReplicas: 1
-  maxReplicas: 2
-  metrics:
-  - type: Object
-    object:
-      target:
-        kind: Service
-        name: producer-service-metric-svc
-      metricName: rabbitmq_queue_size
-      targetValue: 100
-# apiVersion: autoscaling/v2
-# kind: HorizontalPodAutoscaler
-# metadata:
-#   name: horz-auto-scaler
-# spec:
-#   scaleTargetRef:
-#     apiVersion: apps/v1
-#     kind: Deployment
-#     # name: nginx-deployment
-#     name: producer-app-deployment
-#   minReplicas: 1
-#   maxReplicas: 2
-#   metrics:
-#   - type: Pods                 # Earlier this was type: External
-#     pods: 
-#       metric:
-#         name: rabbitmq_queue_size                     # Earlier this was external:
-#       # metricName: "rabbitmq_queue_size"                               # metricName: custom.googleapis.com|worker_pod_metrics|baz
-#       target:
-#         type: Value
-#         averageValue: 100
-#   # - type: External
-#   #   external:
-#   #     metric:
-#   #       name: "rabbitmq-queue-size"  # Replace with your custom metric name
-#   #     target: 
-#   #       type: Value
-#   #       value: 10
----
-
-
-
+  containers:
+  - name: consumer-container
+    image: node:18
+    command:
+    - "/bin/sh"
+    - "-c"
+    - |
+      cd /app
+      npm i
+      node client.js
+    volumeMounts:
+    - name: app-code
+      mountPath: /app
+    envFrom:
+    - configMapRef:
+        name: rabbitmq-config-env
+  volumes:
+  - name: app-code
+    hostPath:
+      # docker-desktop producer directory's path on WSL
+      path:  /run/desktop/mnt/host/wsl/consumer

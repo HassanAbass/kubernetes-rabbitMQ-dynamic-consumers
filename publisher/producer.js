@@ -5,7 +5,7 @@ const promClient = require('prom-client');
 require('dotenv').config();
 
 const queueName = 'producer-queue'
-
+let queueSize = 0;
 const main = async () => {
   try {
     const username = process.env.RABBITMQ_USERNAME;
@@ -16,9 +16,7 @@ const main = async () => {
     await channel.assertQueue(queueName);
     // Function to send a message to the queue
     const sendMessage = async () => {
-      const queueCount =( await channel.checkQueue(queueName)).messageCount;
-
-      const message = `Hello, RabbitMQ! Here's a message num_${queueCount}.`;
+      const message = `Hello, RabbitMQ! Here's a message num_${queueSize++}.`;
       channel.sendToQueue(queueName, Buffer.from(message));
       console.log(`Sent: ${message}`);
     };

@@ -66,3 +66,22 @@ roleRef:
   kind: ClusterRole
   name: cluster-admin
   apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: delete-pods-cronjob
+spec:
+  schedule: "0 18 * * *"  # Schedule it to run at 6:00 PM (18:00) every day.
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: kubectl
+              image: bitnami/kubectl
+              command:
+                - /bin/sh
+                - -c
+                - kubectl get pods -n default | grep 'rabbitmq-worker-pod-' | awk '{print $1}' | xargs -I {} kubectl delete pod -n default {}
+          restartPolicy: Never

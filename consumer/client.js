@@ -60,4 +60,4 @@ const checkAndCreateConsumer = async () => {
     }
 }
 // createRabbitMQConsumerPod();
-setInterval(checkAndCreateConsumer, 10000);// 50 seconds
+setInterval(checkAndCreateConsumer, 50000);// 50 seconds
